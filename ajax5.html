@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        button {
+            margin: 20px 0;
+            display: block;
+        }
+        input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .result {
+            display: flex;
+            flex-wrap: wrap;
+            width: 350px;
+        }
+        .card {
+            margin: 10px;
+            width: 150px;
+           
+        }
+        .card-img {
+            display: block;
+            width: 150px;
+            height: 100px;
+        }
+        .resultFinally {
+            font-weight: bold;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        
+    </style>    
+    <title>ajax5</title>
+</head>
+<body>
+    
+    <label for="input1">Номер страницы</label>
+    <input id="input1" type="text" placeholder="Введите любое число">
+    <label for="input2">Лимит</label>
+    <input id="input2" type="text" placeholder="Введите любое число">
+    <button class='button'>Запрос</button>
+    
+    <div class="result"></div>
+    <div class="resultFinally"></div>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", loadImg);
+        
+        function loadImg() {
+            
+            const btn = document.querySelector('.button');
+            const input1 = document.querySelector('#input1');
+            const input2 = document.querySelector('#input2'); 
+            const resultDiv = document.querySelector('.result');
+            let cards;
+
+            fromLocal();
+            
+            function request() {
+                return fetch(`https://picsum.photos/v2/list?page=${input1.value}&limit=${input2.value}`) 
+                        .then (response => {
+                            return response.json()
+                            })
+                        .then(data => {
+                            return data;
+                        })
+                        .catch(() => {
+                            writeOutput(`Ошибка! Неверный URL`);
+                        })
+                        .finally(() => {
+                            writeOutputFinally('Задание выполнено!');
+                            input1.value = '';
+                            input2.value = '';
+                        })
+            }
+
+            function valid(value, start, end) {
+                if (value === '' || !isFinite(value) || value < start || value > end) {
+                    return false;
+                } else return true;
+            }
+
+            function validateInput(value1, value2) {
+                let start = 1;
+                let end = 10;
+
+                if (valid(value1, start, end) && valid(value2, start, end)) {
+                    validated = true;
+                } else {
+                     if (!valid(value1, start, end)) {
+                            validated = `Номер страницы вне диапазона от ${start} до ${end}`; 
+                        } if (!valid(value2, start, end)) {
+                            validated = `Лимит вне диапазона от ${start} до ${end}`; 
+                        } if (!valid(value1, start, end) && !valid(value2, start, end)) {
+                            validated = `Номер страницы и лимит вне диапазона от ${start} до ${end}`; 
+                        } 
+                    }
+                
+                return validated;
+            }
+
+            function writeOutput(message) {
+                resultDiv.textContent = message;
+            }
+
+            function writeOutputFinally(message) {
+                const outputFinally = document.querySelector('.resultFinally');
+                outputFinally.textContent = message;
+            }
+
+            function fromLocal() {
+                if(localStorage.getItem('cards')){
+                    resultDiv.innerHTML = localStorage.getItem('cards');
+                }
+            }
+                        
+            async function displayResult() {
+                let valideted = validateInput(input1.value, input2.value);
+                if (valideted === true) {
+                    const responseData = await request();
+                    if(responseData) {
+                        let cards = '';
+                
+                        responseData.forEach(item => {
+                            let cardBlock = `
+                                <div class="card">
+                                    <img src="${item.download_url}" class="card-img">
+                                </div>
+                            `;
+                            cards += cardBlock; 
+                        })
+                        resultDiv.innerHTML = cards;
+                        localStorage.setItem('cards', cards);
+                    }
+                } else writeOutput(validated);
+            }
+
+            btn.addEventListener('click', displayResult);
+        }
+    
+    </script>
+</body>
+</html>

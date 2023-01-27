@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <script>
+    const parser = new DOMParser();
+
+    const xmlString = `
+    <list>
+      <student>
+        <name lang="en">
+          <first>Ivan</first>
+          <second>Ivanov</second>
+        </name>
+        <age>35</age>
+        <prof>teacher</prof>
+      </student>
+      <student>
+        <name lang="ru">
+          <first>Петр</first>
+          <second>Петров</second>
+        </name>
+        <age>58</age>
+        <prof>driver</prof>
+      </student>
+    </list>
+    `;
+
+    const xmlDOM = parser.parseFromString(xmlString, "text/xml"); //получили дом-дерево
+
+    const list = xmlDOM.querySelector("list");
+
+    const students = list.querySelectorAll("student"); 
+
+    const name1 = students[0].querySelector("name");
+    const name2 = students[1].querySelector("name");
+
+    const first1 = name1.querySelector("first");
+    const first2 = name2.querySelector("first");
+
+    const second1 = name1.querySelector("second");
+    const second2 = name2.querySelector("second");
+
+    const age1 = students[0].querySelector("age");
+    const age2= students[1].querySelector("age");
+
+    const prof1 = students[0].querySelector("prof");
+    const prof2= students[1].querySelector("prof");
+
+    const langAttr1 = name1.getAttribute("lang");
+    const langAttr2 = name2.getAttribute("lang");
+
+
+
+    const result = {
+        "list": [
+          {
+            "name": `${first1.textContent} ${second1.textContent}`, "age": +age1.textContent, "prof": prof1.textContent, "lang": langAttr1
+          },
+          {
+            "name": `${first2.textContent} ${second2.textContent}`, "age": +age2.textContent, "prof": prof2.textContent, "lang": langAttr2 
+          }
+        ]
+    };
+ 
+    console.log(result);
+
+  </script>   
+</body>
+</html>

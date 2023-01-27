@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        button {
+            margin: 5px;
+        }
+        .resultFinally {
+            font-weight: bold;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>    
+    <title>Ajax4</title>
+</head>
+<body>
+
+    <input class="input1" type="text" placeholder="Введите любое число">
+    <input class="input2" type="text" placeholder="Введите любое число">
+    <button class='button'>Кнопка</button>
+    <div class="result"></div>
+    <div class="resultFinally"></div>
+
+    <script>
+        
+        function imageLoaded(){
+            const btn = document.querySelector('.button');
+            const resultDiv = document.querySelector('.result');
+            const input1 = document.querySelector('.input1');
+            const input2 = document.querySelector('.input2'); 
+
+            function useFetch(){ 
+                if (validateInput(input1.value, input2.value)){
+                    fetch(`https://picsum.photos/${input1.value}/${input2.value}`) 
+                        .then(response => {
+                            if (response.ok) {
+                                displayResult(response);
+                            }
+                        }) 
+                        .catch(() => {
+                            writeOutput(`Ошибка! Неверный URL`);
+                        })
+                        .finally(() => {
+                            writeOutputFinally('Задание выполнено!');
+                            input1.value = '';
+                            input2.value = '';
+                        });
+                } else {
+                    writeOutput('одно из чисел вне диапазона от 100 до 300');
+                }   
+            }
+        
+            function validateInput(value1, value2) {
+                let validated = true;
+                let start = 100;
+                let end = 300;
+
+                if (value1 === '' || value2 === '' || !isFinite(value1) || !isFinite(value2) 
+                || value1 < start || value1 > end || value2 < start || value2 > end) {
+                    validated = false;
+                }
+                return validated;
+            }
+
+            function writeOutput(message) {
+                resultDiv.textContent = message;
+            }
+
+            function writeOutputFinally(message) {
+                const outputFinally = document.querySelector('.resultFinally');
+                outputFinally.textContent = message;
+            }
+
+            function displayResult(responseData) {
+                debugger;
+                const card = `
+                    <div>
+                        <img src="${responseData.url}">
+                    </div>
+                `;         
+                resultDiv.innerHTML = card;
+            }
+
+            btn.addEventListener('click', useFetch);
+        }
+
+        document.addEventListener("DOMContentLoaded", imageLoaded);
+    </script>
+</body>
+</html>
