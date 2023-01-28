@@ -75,8 +75,8 @@
                         })
                         .finally(() => {
                             writeOutputFinally('Задание выполнено!');
-                            input1.value = '';
-                            input2.value = '';
+                            // input1.value = '';
+                            // input2.value = '';
                         })
             }
 
@@ -115,28 +115,42 @@
             }
 
             function fromLocal() {
-                if(localStorage.getItem('cards')){
-                    resultDiv.innerHTML = localStorage.getItem('cards');
+                if (localStorage.getItem('obj')){
+                    let obj = localStorage.getItem('obj'); 
+                    console.log('Данные из хранилища в формате JSON', obj);
+                    let data = JSON.parse(obj);     
+                    console.log('Данные из хранилища в виде объекта', data);
+                    rendering(data, cards);
                 }
             }
-                        
+
+            function rendering(data, str) {
+                str = '';
+                data.forEach(item => {                                                   
+                    let strBlock = `
+                        <div class="card">
+                            <img src="${item.download_url}" class="card-img">
+                        </div>
+                    `;
+                    str += strBlock; 
+                })
+                resultDiv.innerHTML = str;
+                                               
+            }
+             
+            function toLocal(data) {
+                localStorage.clear();
+                localStorage.setItem('obj', JSON.stringify(data));
+            }
+
             async function displayResult() {
                 let valideted = validateInput(input1.value, input2.value);
                 if (valideted === true) {
                     const responseData = await request();
+                    console.log(responseData);
                     if(responseData) {
-                        let cards = '';
-                
-                        responseData.forEach(item => {
-                            let cardBlock = `
-                                <div class="card">
-                                    <img src="${item.download_url}" class="card-img">
-                                </div>
-                            `;
-                            cards += cardBlock; 
-                        })
-                        resultDiv.innerHTML = cards;
-                        localStorage.setItem('cards', cards);
+                        rendering(responseData, cards);
+                        toLocal(responseData);
                     }
                 } else writeOutput(validated);
             }
